@@ -79,6 +79,10 @@ public class InsnCounter {
 //                }
 //                System.out.println("access");
 //
+                if(entryName.equals("com/lvxiaoxin/staticDemo.class"))
+                    continue;
+
+//                System.out.println(entryName);
 
                 InputStream classFile = jarFile.getInputStream(entry);
                 try {
