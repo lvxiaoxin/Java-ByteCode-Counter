@@ -12,8 +12,53 @@ import java.util.jar.JarFile;
 public class InsnCounter {
     public static void main(final String[] args) throws Exception {
         InsnCounter self = new InsnCounter();
+
+        byte[] staticDemoByte;
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+
+        cw.visit(52, Opcodes.ACC_SUPER+Opcodes.ACC_PUBLIC, "com/lvxiaoxin/staticDemo",
+                null, "java/lang/Object", null);
+        FieldVisitor fv = cw.visitField(Opcodes.ACC_STATIC+Opcodes.ACC_PUBLIC, "count", "I", null, null);
+        fv.visitEnd();
+
+        MethodVisitor con = cw.visitMethod(0, "<init>", "()V", null, null);
+        con.visitCode();
+        con.visitVarInsn(Opcodes.ALOAD, 0);
+        con.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+        con.visitInsn(Opcodes.RETURN);
+        con.visitMaxs(1, 1);
+        con.visitEnd();
+
+        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_STATIC+Opcodes.ACC_PUBLIC, "callme", "()V", null, null);
+        mv.visitCode();
+        mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+        mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
+        mv.visitInsn(Opcodes.DUP);
+        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
+        mv.visitLdcInsn("count: ");
+        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
+        mv.visitFieldInsn(Opcodes.GETSTATIC, "com/lvxiaoxin/staticDemo", "count", "I");
+        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;", false);
+        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+        mv.visitInsn(Opcodes.RETURN);
+        mv.visitMaxs(3, 0);
+        mv.visitEnd();
+
+        cw.visitEnd();
+
+        staticDemoByte = cw.toByteArray();
+        File demoPath = new File("com/lvxiaoxin");
+        if (!demoPath.exists()) {
+            demoPath.mkdirs();
+        }
+        FileOutputStream staFile = new FileOutputStream("com/lvxiaoxin/staticDemo.class");
+        staFile.write(staticDemoByte);
+        staFile.close();
+
         JarFile is = new JarFile("Hello.jar");
         self.parserJar(is);
+        is.close();
     }
 
     public void parserJar(JarFile jarFile) throws Exception {
@@ -38,45 +83,7 @@ public class InsnCounter {
                 InputStream classFile = jarFile.getInputStream(entry);
                 try {
                     byte[] b;
-                    byte[] staticDemoByte;
                     ClassReader cr = new ClassReader(classFile);
-                    ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-
-                    cw.visit(52, Opcodes.ACC_SUPER, "staticDemo",
-                            null, "java/lang/Object", null);
-                    FieldVisitor fv = cw.visitField(Opcodes.ACC_STATIC, "count", "I", null, null);
-                    fv.visitEnd();
-
-                    MethodVisitor con = cw.visitMethod(0, "<init>", "()V", null, null);
-                    con.visitCode();
-                    con.visitVarInsn(Opcodes.ALOAD, 0);
-                    con.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-                    con.visitInsn(Opcodes.RETURN);
-                    con.visitMaxs(1, 1);
-                    con.visitEnd();
-
-                    MethodVisitor mv = cw.visitMethod(Opcodes.ACC_STATIC, "callme", "()V", null, null);
-                    mv.visitCode();
-                    mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-                    mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
-                    mv.visitInsn(Opcodes.DUP);
-                    mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
-                    mv.visitLdcInsn("count: ");
-                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
-                    mv.visitFieldInsn(Opcodes.GETSTATIC, "staticDemo", "count", "I");
-                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;", false);
-                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
-                    mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-                    mv.visitInsn(Opcodes.RETURN);
-                    mv.visitMaxs(3, 0);
-                    mv.visitEnd();
-
-                    cw.visitEnd();
-
-                    staticDemoByte = cw.toByteArray();
-                    FileOutputStream staFile = new FileOutputStream("staticDemo.class");
-                    staFile.write(staticDemoByte);
-                    staFile.close();
 
                     ClassWriter cw2 = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
@@ -154,11 +161,11 @@ class MethodAdapter extends MethodNode {
             AbstractInsnNode node = itr.next();
 
             InsnList numCounting = new InsnList();
-            numCounting.add(new FieldInsnNode(Opcodes.GETSTATIC, "staticDemo", "count", "I"));
+            numCounting.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/lvxiaoxin/staticDemo", "count", "I"));
             numCounting.add(new InsnNode(Opcodes.ICONST_1));
             numCounting.add(new InsnNode(Opcodes.IADD));
-            numCounting.add(new FieldInsnNode(Opcodes.PUTSTATIC, "staticDemo", "count", "I"));
-            numCounting.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "staticDemo", "callme", "()V", false));
+            numCounting.add(new FieldInsnNode(Opcodes.PUTSTATIC, "com/lvxiaoxin/staticDemo", "count", "I"));
+            numCounting.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lvxiaoxin/staticDemo", "callme", "()V", false));
             instructions.insert(node, numCounting);
             maxStack = Math.max(5, maxStack);
         }
