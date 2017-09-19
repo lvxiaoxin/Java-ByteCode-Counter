@@ -8,4 +8,4 @@
 *.jar
 
 # Setting 
-src/.idea
+InsnCounter/.idea

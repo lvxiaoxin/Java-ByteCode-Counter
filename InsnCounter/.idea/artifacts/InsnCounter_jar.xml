@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="InsnCounter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/InsnCounter_jar</output-path>
+    <root id="archive" name="InsnCounter.jar">
+      <element id="module-output" name="InsnCounter" />
+    </root>
+  </artifact>
+</component>

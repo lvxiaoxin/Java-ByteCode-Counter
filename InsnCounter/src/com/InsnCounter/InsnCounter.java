@@ -59,11 +59,11 @@ public class InsnCounter {
         cw.visitEnd();
 
         staticDemoByte = cw.toByteArray();
-        File demoPath = new File("com/lvxiaoxin/");
+        File demoPath = new File("outJar/com/lvxiaoxin/");
         if (!demoPath.exists()) {
             demoPath.mkdirs();
         }
-        FileOutputStream staFile = new FileOutputStream("com/lvxiaoxin/staticDemo.class");
+        FileOutputStream staFile = new FileOutputStream("outJar/com/lvxiaoxin/staticDemo.class");
         staFile.write(staticDemoByte);
         staFile.close();
     }
@@ -81,6 +81,8 @@ public class InsnCounter {
                 if (entryName.equals("com/lvxiaoxin/staticDemo.class")) {
                     continue;
                 }
+                String outPath = "outJar/";
+                outPath += entryName;
                 System.out.println(entryName);
                 InputStream classFile = jarFile.getInputStream(entry);
                 try {
@@ -99,32 +101,34 @@ public class InsnCounter {
                     cr.accept(cv, 0);
                     b = cw2.toByteArray();
 
-                    File cur = new File(entryName);
+                    File cur = new File(outPath);
                     if (cur.getParent() != null) {
                         if (!cur.getParentFile().exists()) {
                             cur.getParentFile().mkdirs();
                         }
                     }
-                    FileOutputStream fos = new FileOutputStream(entryName);
+                    FileOutputStream fos = new FileOutputStream(outPath);
                     fos.write(b);
                     fos.close();
                 } finally {
                     classFile.close();
                 }
             } else if (entryName.contains(".") && !entryName.startsWith("META")) {
+                String outPath = "outJar/";
+                outPath += entryName;
                 System.out.println(entryName);
                 InputStream otherFile = jarFile.getInputStream(entry);
                 try {
                     byte[] b = new byte[10240];
                     otherFile.read(b);
-                    File other_cur = new File(entryName);
+                    File other_cur = new File(outPath);
                     if (other_cur.getParent() != null) {
                         System.out.println(other_cur.getParent());
                         if(!other_cur.getParentFile().exists()) {
                             other_cur.getParentFile().mkdirs();
                         }
                     }
-                    FileOutputStream fos = new FileOutputStream(entryName);
+                    FileOutputStream fos = new FileOutputStream(outPath);
                     fos.write(b);
                     fos.close();
                 } finally {
