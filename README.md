@@ -1,9 +1,17 @@
 # InsCounter
 
-Intro: This is an instrument used for counting the total number of execute bytecode instructions.
+## Intro
+This is an instrument used for counting the total number of execute bytecode instructions.
 
-Input: Jar File
+## Input
+Jar File
 
-Output: Edited Jar file that can output the numebr of execute bytecode instructions.
+## Output
+Edited Jar file that can output the numebr of execute bytecode instructions.
 
-Library: It is based on ASM. 
+## Library
+It is based on ASM. 
+
+## Usage
+
+	
