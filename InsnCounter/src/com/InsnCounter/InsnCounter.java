@@ -14,6 +14,7 @@ public class InsnCounter {
         // init Counter
         InsnCounter self = new InsnCounter();
         self.initRecord();
+        int c = 0;
 
         // Jar Input
         JarFile is = new JarFile(args[0]);
@@ -80,6 +81,7 @@ public class InsnCounter {
                 if (entryName.equals("com/lvxiaoxin/staticDemo.class")) {
                     continue;
                 }
+                System.out.println(entryName);
                 InputStream classFile = jarFile.getInputStream(entry);
                 try {
                     byte[] b;
@@ -97,7 +99,6 @@ public class InsnCounter {
                     cr.accept(cv, 0);
                     b = cw2.toByteArray();
 
-                    System.out.println(entryName);
                     File cur = new File(entryName);
                     if (cur.getParent() != null) {
                         if (!cur.getParentFile().exists()) {
@@ -110,7 +111,27 @@ public class InsnCounter {
                 } finally {
                     classFile.close();
                 }
+            } else if (entryName.contains(".") && !entryName.startsWith("META")) {
+                System.out.println(entryName);
+                InputStream otherFile = jarFile.getInputStream(entry);
+                try {
+                    byte[] b = new byte[10240];
+                    otherFile.read(b);
+                    File other_cur = new File(entryName);
+                    if (other_cur.getParent() != null) {
+                        System.out.println(other_cur.getParent());
+                        if(!other_cur.getParentFile().exists()) {
+                            other_cur.getParentFile().mkdirs();
+                        }
+                    }
+                    FileOutputStream fos = new FileOutputStream(entryName);
+                    fos.write(b);
+                    fos.close();
+                } finally {
+                    otherFile.close();
+                }
             }
+
         }
     }
 }
