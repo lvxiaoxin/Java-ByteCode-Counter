@@ -2,14 +2,13 @@ import jdk.internal.org.objectweb.asm.*;
 import jdk.internal.org.objectweb.asm.tree.*;
 
 import java.io.*;
-import java.nio.Buffer;
-import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.ListIterator;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class InsnCounter {
+
     public static void main(final String[] args) throws Exception {
         InsnCounter self = new InsnCounter();
 
@@ -48,7 +47,7 @@ public class InsnCounter {
         cw.visitEnd();
 
         staticDemoByte = cw.toByteArray();
-        File demoPath = new File("com/lvxiaoxin");
+        File demoPath = new File("com/lvxiaoxin/");
         if (!demoPath.exists()) {
             demoPath.mkdirs();
         }
@@ -56,7 +55,9 @@ public class InsnCounter {
         staFile.write(staticDemoByte);
         staFile.close();
 
-        JarFile is = new JarFile("Hello.jar");
+        JarFile is = new JarFile("InfoTrader.jar");
+//        JarFile is = new JarFile("airplan_5.jar");
+//        JarFile is = new JarFile("Hello.jar");
         self.parserJar(is);
         is.close();
     }
@@ -67,18 +68,7 @@ public class InsnCounter {
             JarEntry entry = entries.nextElement();
             String entryName = entry.getName();
             if(entryName.endsWith(".class")) {
-//
-//                ClassNode classNode = new ClassNode();
-//
-//                InputStream classFileInputStream = jarFile.getInputStream(entry);
-//                try {
-//                    ClassReader classReader = new ClassReader(classFileInputStream);
-//                    classReader.accept(classNode, 0);
-//                } finally {
-//                    classFileInputStream.close();
-//                }
-//                System.out.println("access");
-//
+
                 if(entryName.equals("com/lvxiaoxin/staticDemo.class"))
                     continue;
 
@@ -89,7 +79,31 @@ public class InsnCounter {
                     byte[] b;
                     ClassReader cr = new ClassReader(classFile);
 
-                    ClassWriter cw2 = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+                    ClassWriter cw2 = new ClassWriter(ClassWriter.COMPUTE_FRAMES) {
+
+                        @Override
+                        protected String getCommonSuperClass(String var1, String var2) {
+//                            String var3 = var1.replace('/', '.');
+//                            String var4 = var2.replace('/', '.');
+//                            System.out.println(var3);
+//                            System.out.println(var4);
+//                            String ans = "";
+//                            int length = Math.min(var3.length(), var4.length());
+//                            for(int i=0; i<length; ++i) {
+//                                if(var3.charAt(i) == var4.charAt(i)) {
+//                                    ans += var3.charAt(i);
+//                                } else {
+//                                    break;
+//                                }
+//                            }
+//                            if (ans.length()>=1 && ans.charAt(ans.length()-1) == '.') {
+//                                ans = ans.substring(0, ans.length()-1);
+//                            }
+//                            System.out.println(ans);
+//                            return ans;
+                            return "java/lang/Object";
+                        }
+                    };
 
                     ClassVisitor cv = new ClassAdapter(cw2);
                     cr.accept(cv, 0);
@@ -116,24 +130,10 @@ public class InsnCounter {
 }
 
 
-
 class ClassAdapter extends ClassVisitor implements Opcodes {
     public ClassAdapter(final ClassVisitor cv) {
         super(ASM5, cv);
     }
-//
-//    @Override
-//    public FieldVisitor(int access, String name, String desc, String signature, Object value) {
-//        return new FieldAdapter(access, name, desc, signature, value);
-//    }
-//
-//
-//    @Override
-//    public void visitOuterClass(String owner, String name, String desc) {
-//        if (this.cv != null) {
-//            this.cv.visitOuterClass(owner, name, desc);
-//        }
-//    }
 
     @Override
     public MethodVisitor visitMethod(int access, String name, String desc,
