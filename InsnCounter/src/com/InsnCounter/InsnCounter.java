@@ -3,7 +3,6 @@ package com.InsnCounter;
 import jdk.internal.org.objectweb.asm.*;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -14,7 +13,6 @@ public class InsnCounter {
         // init Counter
         InsnCounter self = new InsnCounter();
         self.initRecord();
-        int c = 0;
 
         // Jar Input
         JarFile is = new JarFile(args[0]);
@@ -22,11 +20,13 @@ public class InsnCounter {
         is.close();
     }
 
+    // init the counter recode, construct the global class and its static field.
     public void initRecord() throws Exception {
 
         byte[] staticDemoByte;
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
+        // count declaration
         cw.visit(52, Opcodes.ACC_SUPER + Opcodes.ACC_PUBLIC, "com/lvxiaoxin/staticDemo",
                 null, "java/lang/Object", null);
         FieldVisitor fv = cw.visitField(Opcodes.ACC_STATIC + Opcodes.ACC_PUBLIC, "count", "I", null, null);
@@ -40,6 +40,7 @@ public class InsnCounter {
         con.visitMaxs(1, 1);
         con.visitEnd();
 
+        // callme function, print the value of count
         MethodVisitor mv = cw.visitMethod(Opcodes.ACC_STATIC + Opcodes.ACC_PUBLIC, "callme", "()V", null, null);
         mv.visitCode();
         mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
@@ -81,6 +82,14 @@ public class InsnCounter {
                 if (entryName.equals("com/lvxiaoxin/staticDemo.class")) {
                     continue;
                 }
+
+                System.out.println(entry.getSize());
+
+                // otherwise, there will be 'Methods code to large" error sometimes.
+                if (entry.getSize() > 24444) {
+                    continue;
+                }
+
                 String outPath = "outJar/";
                 outPath += entryName;
                 System.out.println(entryName);

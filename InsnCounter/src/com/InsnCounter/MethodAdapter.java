@@ -17,16 +17,22 @@ class MethodAdapter extends MethodNode {
     public void visitEnd() {
         ListIterator<AbstractInsnNode> itr = instructions.iterator();
 
+        // core insert
         while (itr.hasNext()) {
 
             AbstractInsnNode node = itr.next();
 
             InsnList numCounting = new InsnList();
+
+            // insert count++
             numCounting.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/lvxiaoxin/staticDemo", "count", "I"));
             numCounting.add(new InsnNode(Opcodes.ICONST_1));
             numCounting.add(new InsnNode(Opcodes.IADD));
             numCounting.add(new FieldInsnNode(Opcodes.PUTSTATIC, "com/lvxiaoxin/staticDemo", "count", "I"));
+
+            // insert the callme function
             numCounting.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lvxiaoxin/staticDemo", "callme", "()V", false));
+
             instructions.insert(node, numCounting);
             maxStack = Math.max(5, maxStack);
         }
