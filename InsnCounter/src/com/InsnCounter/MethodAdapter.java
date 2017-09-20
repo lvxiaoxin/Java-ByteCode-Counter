@@ -25,13 +25,13 @@ class MethodAdapter extends MethodNode {
             InsnList numCounting = new InsnList();
 
             // insert count++
-            numCounting.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/lvxiaoxin/staticDemo", "count", "I"));
-            numCounting.add(new InsnNode(Opcodes.ICONST_1));
-            numCounting.add(new InsnNode(Opcodes.IADD));
-            numCounting.add(new FieldInsnNode(Opcodes.PUTSTATIC, "com/lvxiaoxin/staticDemo", "count", "I"));
+            numCounting.add(new FieldInsnNode(Opcodes.GETSTATIC, "com/lvxiaoxin/staticDemo", "count", "J"));
+            numCounting.add(new InsnNode(Opcodes.LCONST_1));
+            numCounting.add(new InsnNode(Opcodes.LADD));
+            numCounting.add(new FieldInsnNode(Opcodes.PUTSTATIC, "com/lvxiaoxin/staticDemo", "count", "J"));
 
-            // insert the callme function
-            numCounting.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lvxiaoxin/staticDemo", "callme", "()V", false));
+            // insert callme
+//            numCounting.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "com/lvxiaoxin/staticDemo", "callme", "()V", false));
 
             instructions.insert(node, numCounting);
             maxStack = Math.max(5, maxStack);

@@ -29,7 +29,7 @@ public class InsnCounter {
         // count declaration
         cw.visit(52, Opcodes.ACC_SUPER + Opcodes.ACC_PUBLIC, "com/lvxiaoxin/staticDemo",
                 null, "java/lang/Object", null);
-        FieldVisitor fv = cw.visitField(Opcodes.ACC_STATIC + Opcodes.ACC_PUBLIC, "count", "I", null, null);
+        FieldVisitor fv = cw.visitField(Opcodes.ACC_STATIC + Opcodes.ACC_PUBLIC, "count", "J", null, null);
         fv.visitEnd();
 
         MethodVisitor con = cw.visitMethod(0, "<init>", "()V", null, null);
@@ -41,21 +41,21 @@ public class InsnCounter {
         con.visitEnd();
 
         // callme function, print the value of count
-        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_STATIC + Opcodes.ACC_PUBLIC, "callme", "()V", null, null);
-        mv.visitCode();
-        mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-        mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
-        mv.visitInsn(Opcodes.DUP);
-        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
-        mv.visitLdcInsn("count: ");
-        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
-        mv.visitFieldInsn(Opcodes.GETSTATIC, "com/lvxiaoxin/staticDemo", "count", "I");
-        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;", false);
-        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-        mv.visitInsn(Opcodes.RETURN);
-        mv.visitMaxs(3, 0);
-        mv.visitEnd();
+//        MethodVisitor mv = cw.visitMethod(Opcodes.ACC_STATIC + Opcodes.ACC_PUBLIC, "callme", "()V", null, null);
+//        mv.visitCode();
+//        mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+//        mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
+//        mv.visitInsn(Opcodes.DUP);
+//        mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
+//        mv.visitLdcInsn("count: ");
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
+//        mv.visitFieldInsn(Opcodes.GETSTATIC, "com/lvxiaoxin/staticDemo", "count", "J");
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;", false);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+//        mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+//        mv.visitInsn(Opcodes.RETURN);
+//        mv.visitMaxs(4, 0);
+//        mv.visitEnd();
 
         cw.visitEnd();
 
@@ -78,15 +78,10 @@ public class InsnCounter {
 
             JarEntry entry = entries.nextElement();
             String entryName = entry.getName();
-            if (entryName.endsWith(".class")) {
+            // otherwise, there will be 'Methods code to large" error sometime.
+            System.out.println("File size: " + entry.getSize());
+            if (entryName.endsWith(".class") && (entry.getSize() <= 10000)) {
                 if (entryName.equals("com/lvxiaoxin/staticDemo.class")) {
-                    continue;
-                }
-
-                System.out.println(entry.getSize());
-
-                // otherwise, there will be 'Methods code to large" error sometimes.
-                if (entry.getSize() > 24444) {
                     continue;
                 }
 
@@ -122,13 +117,13 @@ public class InsnCounter {
                 } finally {
                     classFile.close();
                 }
-            } else if (entryName.contains(".") && !entryName.startsWith("META")) {
+            } else if ((entryName.contains(".") && !entryName.startsWith("META")) || entry.getSize() > 10000) {
                 String outPath = "outJar/";
                 outPath += entryName;
                 System.out.println(entryName);
                 InputStream otherFile = jarFile.getInputStream(entry);
                 try {
-                    byte[] b = new byte[10240];
+                    byte[] b = new byte[(int)entry.getSize()];
                     otherFile.read(b);
                     File other_cur = new File(outPath);
                     if (other_cur.getParent() != null) {
@@ -144,7 +139,6 @@ public class InsnCounter {
                     otherFile.close();
                 }
             }
-
         }
     }
 }
