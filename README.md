@@ -2,6 +2,10 @@
 
 # InsCounter
 
+[![Language](https://img.shields.io/badge/language-Java-red.svg)](http://www.cplusplus.com/) 
+[![license](https://img.shields.io/badge/license-MIT-green.svg)]()
+
+
 ## Introduction
 
 This is an instrument used for counting the total number of execute bytecode instructions.
