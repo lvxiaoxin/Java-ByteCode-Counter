@@ -1,21 +1,28 @@
+<img src="asm.png" align="right" width=25% height=25%>
+
 # InsCounter
 
-## Intro
+## Introduction
+
 This is an instrument used for counting the total number of execute bytecode instructions.
 
 ## Input
-Jar File
+
+Your Jar File.
 
 ## Output
+
 Edited Jar file that can output the numebr of execute bytecode instructions.
 
 ## Library
-It is based on ASM. 
+
+It is based on [ASM](). 
 
 ## Usage
+
 **Step 1**
 
-Put the `InsnCounter.jar`, `asm-all-5.0.3.jar`, and the jar file you want to count in the same directory.
+Put `InsnCounter.jar`, `asm-all-5.0.3.jar`, and the jar file you want to count in the same directory.
 
 For example: 
 Here we have: `InsnCounter.jar`, `asm-all-5.0.3.jar`, `Hello.jar` in one directory.
@@ -32,9 +39,9 @@ For here, we run
 
 **Step 3**
 
-You will find that there is a new folder created under the directory, called "outJar". All the edited bytecode are shown there.
+You will find that there is a new folder called "outJar" created under the directory. All the edited bytecode are shown there.
 
-To build artifacts, just chang to the "outJar" directory and run jar command.
+To build artifacts, just chang your directory to "outJar" and run jar command.
 
 For here, we run:
 
